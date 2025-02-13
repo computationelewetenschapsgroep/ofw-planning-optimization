@@ -4,6 +4,8 @@ Service Lifecycle Design &amp; Optimization for Offshore Wind Farm Development
 
 ## Setup
 
+https://learn.microsoft.com/en-us/python/api/overview/azure/digitaltwins-core-readme?view=azure-python
+
 ### Configure azure-cli
 
 1. `brew update && brew install azure-cli`

@@ -3,7 +3,7 @@ from azure.identity import DefaultAzureCredential
 from azure.digitaltwins.core import DigitalTwinsClient
 
 INSTANCE_NAME = os.getenv("ADT_INSTANCE_NAME")
-endpoint = f"https://{INSTANCT_NAME}.api.neu.digitaltwins.azure.net"
+endpoint = f"https://{INSTANCE_NAME}.api.neu.digitaltwins.azure.net"
 
 credential = DefaultAzureCredential()
 
