@@ -11,7 +11,7 @@ credential = DefaultAzureCredential()
 
 client = DigitalTwinsClient(endpoint, credential)
 
-digital_twin_id = 'Vessel003'
+digital_twin_id = 'TClass'
 temporary_twin = {
     "$metadata": {
         "$model": "dtmi:digitaltwins:isa95:Vessel;1"
@@ -35,6 +35,27 @@ temporary_twin = {
         }
     }
 }
+
+
+digital_twin_id = 'C1.5'
+temporary_twin = {
+    "$metadata": {
+        "$model": "dtmi:digitaltwins:isa95:Monopile;1"
+    },
+    "$dtId": digital_twin_id,  
+    "description": {
+        "$metadata": {
+            "val" : "val"
+        }    
+    },
+    "tags": {
+        "$metadata": {
+            "abc": "abc"
+        }
+    }
+}
+
+
 
 created_twin = client.upsert_digital_twin(digital_twin_id, temporary_twin)
 print(f'Created Digital Twin: {created_twin}')
