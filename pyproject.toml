@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "ofw-planning-optimization"
+version = "0.1.0"
+description = ""
+authors = ["aryant"]
+readme = "README.md"
+packages = [{include = "ofw_planning_optimization"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+azure-digitaltwins-core = "^1.2.0"
+azure-identity = "^1.19.0"
+pydantic = "^2.10.6"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
