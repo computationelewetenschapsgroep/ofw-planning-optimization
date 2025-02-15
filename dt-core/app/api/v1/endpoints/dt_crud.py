@@ -170,30 +170,74 @@ async def delete_port_dt(port_id: str):
 
 @router.put("/dt/ofw/{ofw_id}",status_code=status.HTTP_200_OK)
 async def create_ofw_dt(ofw_id: str, offshore_wind_farm: OffshoreWindFarm):
-    pass 
+    ofw_twin =  {
+    "$metadata": {
+        "$model": "dtmi:digitaltwins:isa95:OffshoreWindFarm;1"
+    },
+    "$dtId": ofw_id,  
+    "tags": {
+        "$metadata": {
+            "abc": "aa"
+        }
+    },
+
+    "spatialDefinition": {
+        "value": offshore_wind_farm.site_location,
+        "format": "WKT",
+        "$metadata": {
+            "EPSG Code": "WGS 84",
+            "model": "dtmi:digitaltwins:isa95:SpatialDefinition;1"
+        }
+    }
+    }
+    created_twin = adt_service.client.upsert_digital_twin(ofw_id, ofw_twin)
+    logger.info(f'Created Digital Twin: {created_twin}')
+    return created_twin
 
 
 @router.get("/dt/ofw/{ofw_id}",status_code=status.HTTP_200_OK)
 async def read_ofw_dt(ofw_id: str):
-    pass 
+     return adt_service.client.get_digital_twin(ofw_id)
 
 
 @router.delete("/dt/ofw/{ofw_id}",status_code=status.HTTP_200_OK)
 async def delete_ofw_dt(ofw_id: str):
-    pass 
+    adt_service.client.delete_digital_twin(ofw_id)
 
 
 @router.put("/dt/yards/{yard_id}",status_code=status.HTTP_200_OK)
 async def create_yard_dt(yard_id: str, fabrication_yard: FabricationYard):
-    pass 
+    fab_yard_twin =  {
+    "$metadata": {
+        "$model": "dtmi:digitaltwins:isa95:FabricationYard;1"
+    },
+    "$dtId": yard_id,  
+    "tags": {
+        "$metadata": {
+            "abc": "aa"
+        }
+    },
+
+    "spatialDefinition": {
+        "value": fabrication_yard.yard_location,
+        "format": "WKT",
+        "$metadata": {
+            "EPSG Code": "WGS 84",
+            "model": "dtmi:digitaltwins:isa95:SpatialDefinition;1"
+        }
+    }
+    }
+    created_twin = adt_service.client.upsert_digital_twin(yard_id, fab_yard_twin)
+    logger.info(f'Created Digital Twin: {created_twin}')
+    return created_twin
 
 
 @router.get("/dt/yards/{yard_id}",status_code=status.HTTP_200_OK)
 async def read_yard_dt(yard_id: str):
-    pass 
+    return adt_service.client.get_digital_twin(yard_id)
 
 @router.delete("/dt/yards/{yard_id}",status_code=status.HTTP_200_OK)
 async def delete_yard_dt(yard_id: str):
-    pass 
+    adt_service.client.delete_digital_twin(yard_id)
 
 

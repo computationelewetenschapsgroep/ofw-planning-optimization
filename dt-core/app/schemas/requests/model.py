@@ -18,14 +18,12 @@ class Port(BaseModel):
     port_location: str
 
 class OffshoreWindFarm(BaseModel):
-    site_id: str
     site_name: str
     site_layout: str
     site_location: str
         
 
 class FabricationYard(BaseModel):
-    yard_id: str
     yard_name: str
     yard_layout: str
     yard_location: str
