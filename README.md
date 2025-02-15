@@ -15,10 +15,12 @@ https://learn.microsoft.com/en-us/python/api/overview/azure/digitaltwins-core-re
 
 1. `az dt list`
 
-## Run the Script
+## Run the APP
 
 1. Set the environment variable for "ADT_INSTANCE_NAME"
-2. Run python3 list_digital_twin_models.py
+2. Go to ./dt-core and start the app with
+    ``` sh run.sh```
+3. The docs of the api are at ```http://0.0.0.0:8001/docs#/```    
 
 
 
