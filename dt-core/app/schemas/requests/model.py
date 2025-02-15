@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import List, Tuple
 
 class Vessel(BaseModel):
     vessel_name: str
@@ -12,7 +13,6 @@ class Monopile(BaseModel):
     monopile_name: str
 
 class Port(BaseModel):
-    port_id: str
     port_name: str
     port_layout: str
     port_location: str
@@ -29,4 +29,11 @@ class FabricationYard(BaseModel):
     yard_name: str
     yard_layout: str
     yard_location: str
-                
+
+
+class Relation(BaseModel):
+    relation_id: str
+    source_twin: str
+    relation_name: str
+    target_twin: str
+
