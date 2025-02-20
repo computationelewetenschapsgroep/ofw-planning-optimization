@@ -1,6 +1,6 @@
 ## Rough Sketch of the Model
 
-Please model.md
+Please refer to model.md
 
 
 ## Run the app
