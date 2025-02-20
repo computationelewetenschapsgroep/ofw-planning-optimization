@@ -1,0 +1,5 @@
+streamlit==1.38.0
+networkx==3.2.1
+shapely==2.0.7
+nextroute==1.11.4
+nextmv==0.15.1

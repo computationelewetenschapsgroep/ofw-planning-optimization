@@ -3,6 +3,7 @@ from abc import ABCMeta
 from  networkx import DiGraph
 from typing import Union
 from enum import Enum
+from datetime import datetime
 
 class LocationType(Enum):
     PORT=1
@@ -60,7 +61,10 @@ class Vessel(BaseModel):
     transport_capacity: int
     availability: bool
     #status: Union[Mobilizing, Sailing, Loading, Storing, Installing, Waiting]
+    start_date: datetime
+    end_date: datetime
     speed : float
+
     class Config:
         arbitrary_types_allowed=True
 
@@ -124,30 +128,7 @@ class FlowGraph(DiGraph):
 sample_input = {
   "defaults": {
     "vehicles": {
-      "capacity": {
-        "bunnies": 20,
-        "rabbits": 10
-      },
-      "start_location": {
-        "lat": 57.5421047,
-        "lon": 9.717241
-      },
-      "end_location": {
-        "lat":36.8760617,
-        "lon": -75.9904406
-      },
       "speed": 34.44
-    },
-    "stops": {
-      "duration": 172800,
-      "quantity": {
-        "bunnies": -1,
-        "rabbits": -1
-      },
-      "unplanned_penalty": 200000,
-      "target_arrival_time": "2025-03-07T10:00:00Z",
-      "early_arrival_time_penalty": 1.5,
-      "late_arrival_time_penalty": 1.5
     }
   },
   "stops": [
@@ -165,7 +146,8 @@ sample_input = {
         "lon": 11.9139664,
         "lat":  54.2977437
       },
-      "compatibility_attributes": ["premium"]
+      "compatibility_attributes": ["premium"],
+      "succeeds": "s1"
     }
   ],
   "vehicles": [

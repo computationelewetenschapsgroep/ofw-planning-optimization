@@ -3,7 +3,7 @@ from model import VesselName, VesselRole , Vessel
 from model import Node, Edge, FlowGraph, LocationType, ActivityType
 from shapely import Point
 from typing import List
-from pyvis.network import Network
+#from pyvis.network import Network
 import streamlit.components.v1 as components
 import pandas as pd
 import networkx as nx
@@ -46,7 +46,7 @@ if 'schedule' not in st.session_state:
 if 'genPlan' not in st.session_state:
     st.session_state.genPlan = pd.DataFrame(
         [
-            {"Vessed ID":"V1.1001","Stops Id": "Port 1.1001" , "Latitude": 0.0, "Longitude": 0.0, "Arrival Time": today, "Total Travel Duration": 0.0, "End Time": today, "Start Time": today,  "Travel Duration": 0.0},
+            {"Vessed ID":"V1.1001","Stops Id": "Port 1.1001" , "Latitude": 0.0, "Longitude": 0.0, "Arrival Time": today, "Total Travel Duration": 0.0, "End Time": today, "Start Time": today,  "Travel Duration": 0.0, "Travel Distance": 0.0},
         ]
     )
 
@@ -55,7 +55,9 @@ def add_vessel(type, role,
                longitude, 
                capacity, 
                availability,
-               speed):
+               speed,
+               start_date,
+               end_date):
     st.session_state.vessels.append(Vessel(
         vessel_type=type,
         vessel_role=role,
@@ -63,7 +65,9 @@ def add_vessel(type, role,
         longitude=longitude,
         transport_capacity=capacity,
         availability=availability,
-        speed = speed
+        speed = speed,
+        start_date=start_date,
+        end_date=end_date
     ))
 
 def add_nodes(location_type, 
@@ -101,14 +105,66 @@ def add_edges(
 
 def run_planner():
     st.session_state.genPlan.drop(st.session_state.genPlan.index, inplace=True)
-    unique_vessels = []
+    unique_vessels: List[Vessel] = []
     for vessel in  st.session_state.vessels:
-        if vessel not in unique_vessels:
+        if vessel.latitude == 0.0 or vessel.longitude == 0.0:
+            continue
+        if vessel.vessel_type.name not in list(map(lambda item: item.vessel_type.name ,unique_vessels)):
             unique_vessels.append(vessel)
-            
+    sample_input["vehicles"] = []  
+          
+    for vessel in unique_vessels:
+        sample_input["vehicles"].append(
+            {
+                "id": vessel.vessel_type.name,
+               "start_location": {
+                   "lon": vessel.longitude,
+                   "lat": vessel.latitude
+               } ,
+               "start_time": vessel.start_date.strftime("%Y-%m-%dT%H:%M:%S-%H:%M"),
+               "end_time": vessel.end_date.strftime("%Y-%m-%dT%H:%M:%S-%H:%M"),
+               "capacity": vessel.transport_capacity
+            }
+        )
+    
+    stops: List[Node] = []
+    for node in st.session_state.nodes:
+        if node.latitude == 0.0 or node.longitude == 0.0:
+            continue
+        if node.id not in list(map(lambda item: item.id, stops)):
+            stops.append(node)
+    sample_input["stops"] = []
+    for stop in stops:
+         sample_input["stops"].append({
+             "id": stop.id,
+             "name": stop.name,
+             "location": {
+                 "lon": stop.longitude,
+                "lat": stop.latitude
+             },
+             "demand": stop.demand,
+             "duration": 0
+         })
+   
+    
+    for edge in st.session_state.flow_graph.edges:
+            source, target = edge
+            print(st.session_state.flow_graph.edges[source,target])
+            for stop in  sample_input["stops"]:
+                if source == target:
+                    stop["duration"] += st.session_state.flow_graph.edges[source,target]["duration"]*3600
+                    continue
+                if stop["name"] == target:
+                    stop["succeeds"] = st.session_state.flow_graph.nodes[source]["id"]
+
+    print(sample_input)    
     input = nextmv.Input(data=sample_input, options=options)
     output = model.solve(input)
+    print(output) 
     for elem in output.solution['vehicles']:
+        route_travel_distance = 0.0
+        if 'route_travel_distance' in elem.keys():
+            route_travel_distance = elem['route_travel_distance'] / 1000
         for route in elem['route']:
             st.session_state.genPlan.loc[len(st.session_state.genPlan)] = [elem['id'], 
                                                                                route['stop']['id'],
@@ -118,7 +174,11 @@ def run_planner():
                                                                                route['cumulative_travel_duration'],
                                                                                route['end_time'],
                                                                                route['start_time'],
-                                                                               route['travel_duration']]
+                                                                               route['travel_duration']/3600,
+                                                                               route_travel_distance
+                                                                               ]
+
+st.title("Orsted PROSIM Scenario Generation")
 
 with st.form("Vessel"):
     st.write("Add Vessel Details")
@@ -148,6 +208,8 @@ with st.form("Vessel"):
     
     speed = st.text_input("Vessel Speed", "0.0")
 
+    start_date = st.date_input("Vessel Start Time")
+    end_date = st.date_input("Vessel End Time")
 
     st.form_submit_button("Add Vessel",
                           on_click=add_vessel,
@@ -157,7 +219,9 @@ with st.form("Vessel"):
                                 float(longitude),
                                 int(capacity),
                                 bool(vessel_availability),
-                                speed),
+                                speed,
+                                start_date,
+                                end_date),
                                 )
         
 
@@ -227,17 +291,7 @@ with st.form("Flow Graph"):
                                                 edges = st.session_state.edges)
         df = nx.to_pandas_adjacency(st.session_state.flow_graph)
         st.dataframe(df, use_container_width=True)
-        # flow_net = Network(
-        #                     height='400px',
-        #                     width='100%',
-        #                     bgcolor='#222222',
-        #                     font_color='white'
-        #                     )
-
-        # flow_net.from_nx(st.session_state.flow_graph)
-        # flow_net.save_graph("./flow_net.html")
-        # HtmlFile = open('./flow_net.html', 'r', encoding='utf-8')
-        # components.html(HtmlFile.read(), height=435)
+       
 
 with st.form("Add Schedule"):
     st.write("Create Installation Schedule")
